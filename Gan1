@@ -1,0 +1,120 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
+
+public class TableValidator {
+
+    private WebDriver driver;
+
+    public TableValidator(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    /**
+     * Validates table values row by row, including subtables, in order.
+     *
+     * @param tableLocator Locator for the main table
+     * @param expectedValues List of expected values for validation
+     * @return true if the table matches the expected values, false otherwise
+     */
+    public boolean validateTable(By tableLocator, List<List<String>> expectedValues) {
+        WebElement table = driver.findElement(tableLocator);
+        List<WebElement> rows = table.findElements(By.tagName("tr"));
+
+        // Ensure the number of rows matches the expected values
+        if (rows.size() != expectedValues.size()) {
+            System.out.println("Row count mismatch.");
+            return false;
+        }
+
+        for (int i = 0; i < rows.size(); i++) {
+            WebElement row = rows.get(i);
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+
+            // Validate row values
+            List<String> expectedRowValues = expectedValues.get(i);
+            int cellIndex = 0;
+
+            for (WebElement cell : cells) {
+                // Check if the cell contains a subtable
+                WebElement subTable = null;
+                try {
+                    subTable = cell.findElement(By.tagName("table"));
+                } catch (Exception e) {
+                    // No subtable in this cell
+                }
+
+                if (subTable != null) {
+                    // Validate the subtable
+                    List<List<String>> expectedSubTableValues = extractSubTableExpectedValues(expectedRowValues.get(cellIndex));
+                    if (!validateSubTable(subTable, expectedSubTableValues)) {
+                        System.out.println("Subtable validation failed in row " + i + ", cell " + cellIndex);
+                        return false;
+                    }
+                } else {
+                    // Validate the cell's text
+                    String actualValue = cell.getText().trim();
+                    if (!actualValue.equals(expectedRowValues.get(cellIndex))) {
+                        System.out.println("Mismatch in row " + i + ", cell " + cellIndex + ". Expected: " + expectedRowValues.get(cellIndex) + ", Actual: " + actualValue);
+                        return false;
+                    }
+                }
+                cellIndex++;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Validates a subtable's values.
+     *
+     * @param subTable The WebElement representing the subtable
+     * @param expectedSubTableValues List of expected values for the subtable
+     * @return true if the subtable matches the expected values, false otherwise
+     */
+    private boolean validateSubTable(WebElement subTable, List<List<String>> expectedSubTableValues) {
+        List<WebElement> rows = subTable.findElements(By.tagName("tr"));
+
+        if (rows.size() != expectedSubTableValues.size()) {
+            System.out.println("Subtable row count mismatch.");
+            return false;
+        }
+
+        for (int i = 0; i < rows.size(); i++) {
+            WebElement row = rows.get(i);
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+            List<String> expectedRowValues = expectedSubTableValues.get(i);
+
+            if (cells.size() != expectedRowValues.size()) {
+                System.out.println("Subtable column count mismatch in row " + i);
+                return false;
+            }
+
+            for (int j = 0; j < cells.size(); j++) {
+                String actualValue = cells.get(j).getText().trim();
+                if (!actualValue.equals(expectedRowValues.get(j))) {
+                    System.out.println("Mismatch in subtable row " + i + ", cell " + j + ". Expected: " + expectedRowValues.get(j) + ", Actual: " + actualValue);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Extract expected values for a subtable (custom logic can be added as needed).
+     *
+     * @param value The expected value containing subtable data
+     * @return A nested list of expected values for the subtable
+     */
+    private List<List<String>> extractSubTableExpectedValues(String value) {
+        // Example logic: Parse the string into subtable rows and columns
+        // Customize based on the data format in your test
+        return List.of(
+            List.of("SubValue1", "SubValue2"),
+            List.of("SubValue3", "SubValue4")
+        );
+    }
+}
