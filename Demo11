@@ -1,0 +1,36 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.util.List;
+
+public class TableExtractorExample {
+    public static void main(String[] args) {
+        // Set up WebDriver
+        System.setProperty("webdriver.chrome.driver", "path_to_chromedriver");
+        WebDriver driver = new ChromeDriver();
+        
+        try {
+            // Navigate to the page containing the table
+            driver.get("http://example.com");
+
+            // Create an instance of TableExtractor
+            TableExtractor tableExtractor = new TableExtractor(driver);
+
+            // Locator for the main table
+            By mainTableLocator = By.cssSelector("table.no-border.table-striped");
+
+            // Extract table values
+            List<String> tableValues = tableExtractor.extractTableValues(mainTableLocator);
+
+            // Print the extracted values
+            System.out.println("Extracted Table Values:");
+            for (String value : tableValues) {
+                System.out.println(value);
+            }
+
+        } finally {
+            // Close the browser
+            driver.quit();
+        }
+    }
+}
