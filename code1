@@ -1,0 +1,71 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TableExtractor {
+
+    private WebDriver driver;
+
+    public TableExtractor(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    /**
+     * Extracts values from the main table and subtables in the order of rows and columns.
+     *
+     * @param tableLocator Locator for the main table
+     * @return List of values in row and column order, including subtable values
+     */
+    public List<String> extractTableValues(By tableLocator) {
+        List<String> allValues = new ArrayList<>();
+        WebElement table = driver.findElement(tableLocator);
+        List<WebElement> rows = table.findElements(By.tagName("tr"));
+
+        for (WebElement row : rows) {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+
+            for (WebElement cell : cells) {
+                // Check if the cell contains a subtable
+                WebElement subTable = null;
+                try {
+                    subTable = cell.findElement(By.tagName("table"));
+                } catch (Exception e) {
+                    // No subtable in this cell
+                }
+
+                if (subTable != null) {
+                    // Extract values from the subtable
+                    allValues.addAll(extractSubTableValues(subTable));
+                } else {
+                    // Add the cell's text value
+                    String cellValue = cell.getText().trim();
+                    allValues.add(cellValue);
+                }
+            }
+        }
+        return allValues;
+    }
+
+    /**
+     * Extracts values from a subtable in the order of rows and columns.
+     *
+     * @param subTable The WebElement representing the subtable
+     * @return List of values from the subtable
+     */
+    private List<String> extractSubTableValues(WebElement subTable) {
+        List<String> subTableValues = new ArrayList<>();
+        List<WebElement> rows = subTable.findElements(By.tagName("tr"));
+
+        for (WebElement row : rows) {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+            for (WebElement cell : cells) {
+                String cellValue = cell.getText().trim();
+                subTableValues.add(cellValue);
+            }
+        }
+        return subTableValues;
+    }
+}
