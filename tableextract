@@ -1,0 +1,70 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.*;
+
+public class TableExtractorWithOrder {
+
+    private WebDriver driver;
+
+    public TableExtractorWithOrder(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    /**
+     * Extracts values from a main table and its subtables in insertion order.
+     *
+     * @param tableLocator Locator for the main table
+     * @return List of values in row-column order, including nested tables, preserving insertion order
+     */
+    public List<String> extractTableValuesInOrder(By tableLocator) {
+        List<String> allValues = new LinkedList<>(); // To maintain insertion order
+        Set<WebElement> visitedTables = new HashSet<>(); // To avoid processing the same table multiple times
+        WebElement mainTable = driver.findElement(tableLocator);
+        extractValuesFromTable(mainTable, allValues, visitedTables);
+        return allValues;
+    }
+
+    /**
+     * Recursively extracts values from a table or subtable in row-column order, preserving insertion order.
+     *
+     * @param table          WebElement representing the current table
+     * @param allValues      List to store extracted values in insertion order
+     * @param visitedTables  Set to track visited tables and avoid reprocessing
+     */
+    private void extractValuesFromTable(WebElement table, List<String> allValues, Set<WebElement> visitedTables) {
+        if (visitedTables.contains(table)) {
+            // Skip already-visited tables
+            return;
+        }
+
+        visitedTables.add(table); // Mark this table as visited
+
+        List<WebElement> rows = table.findElements(By.tagName("tr")); // Get all rows
+        for (WebElement row : rows) {
+            List<WebElement> cells = row.findElements(By.tagName("td")); // Get all cells in the row
+
+            for (WebElement cell : cells) {
+                // Check if the cell contains a subtable
+                WebElement subTable = null;
+                try {
+                    subTable = cell.findElement(By.tagName("table"));
+                } catch (Exception e) {
+                    // No subtable in this cell
+                }
+
+                if (subTable != null && !visitedTables.contains(subTable)) {
+                    // Recursively process the subtable
+                    extractValuesFromTable(subTable, allValues, visitedTables);
+                } else {
+                    // Add the cell's text value while preserving the order
+                    String cellValue = cell.getText().trim();
+                    if (!cellValue.isEmpty()) {
+                        allValues.add(cellValue);
+                    }
+                }
+            }
+        }
+    }
+}
