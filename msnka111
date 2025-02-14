@@ -1,0 +1,157 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class AGGridPage {
+    private WebDriver driver;
+    private WebDriverWait wait;
+
+    private By gridRows = By.cssSelector(".ag-row");
+    private By noRowsOverlay = By.cssSelector(".ag-overlay-no-rows-center");
+    private By columnHeaders = By.cssSelector(".ag-header-cell-text");
+    private By gridContainer = By.cssSelector(".ag-root");
+    
+    public AGGridPage(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
+    
+    public boolean isNoRecordsDisplayed() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(noRowsOverlay)).isDisplayed();
+    }
+    
+    public List<String> getColumnValues(int columnIndex) {
+        List<WebElement> rows = driver.findElements(gridRows);
+        return rows.stream()
+                .map(row -> row.findElements(By.cssSelector(".ag-cell")))
+                .filter(cells -> cells.size() > columnIndex)
+                .map(cells -> cells.get(columnIndex).getText().trim())
+                .collect(Collectors.toList());
+    }
+    
+    public boolean isColumnSorted(int columnIndex, boolean ascending) {
+        List<String> columnData = getColumnValues(columnIndex);
+        List<String> sortedData = columnData.stream().sorted().collect(Collectors.toList());
+        if (!ascending) {
+            sortedData.sort((a, b) -> b.compareTo(a));
+        }
+        return columnData.equals(sortedData);
+    }
+    
+    public void applyFilter(int columnIndex, String filterText) {
+        List<WebElement> headers = driver.findElements(columnHeaders);
+        headers.get(columnIndex).click(); // Open filter menu
+        WebElement filterInput = driver.findElement(By.cssSelector("input.ag-input-field-input"));
+        filterInput.clear();
+        filterInput.sendKeys(filterText);
+    }
+    
+    public boolean isFilterApplied(int columnIndex, String expectedValue) {
+        return getColumnValues(columnIndex).stream().allMatch(value -> value.contains(expectedValue));
+    }
+
+    // ✅ New Method to Verify AG Grid Auto Height Layout
+    public boolean isAutoHeightEnabled() {
+        WebElement grid = driver.findElement(gridContainer);
+        int initialHeight = grid.getSize().getHeight();
+
+        List<WebElement> rows = driver.findElements(gridRows);
+        int rowCountBefore = rows.size();
+
+        // Perform some action that changes row count (like filtering)
+        applyFilter(0, ""); // Example filter, adjust as needed
+
+        // Wait for UI changes
+        wait.until(ExpectedConditions.numberOfElementsToBeLessThan(gridRows, rowCountBefore));
+
+        // Get new height after row count changes
+        int newHeight = grid.getSize().getHeight();
+        rows = driver.findElements(gridRows);
+
+        // Check that the grid height matches the number of rows displayed
+        boolean isHeightAdjusted = newHeight != initialHeight;
+        boolean isScrollingDisabled = !grid.getAttribute("class").contains("ag-scrolls-vertically");
+
+        return isHeightAdjusted && isScrollingDisabled;
+    }
+}
+
+
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class AGGridUtils {
+    private WebDriver driver;
+
+    public AGGridUtils(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    /**
+     * Verify if a column is sorted correctly (Ascending or Descending)
+     * @param columnName The column name to verify sorting
+     * @param ascending True for ascending, false for descending order check
+     * @return True if sorted correctly, otherwise False
+     */
+    public boolean isColumnSorted(String columnName, boolean ascending) {
+        try {
+            // Find the column index based on the column name
+            List<WebElement> columnHeaders = driver.findElements(By.cssSelector(".ag-header-cell-text"));
+            int colIndex = -1;
+
+            for (int i = 0; i < columnHeaders.size(); i++) {
+                if (columnHeaders.get(i).getText().trim().equalsIgnoreCase(columnName)) {
+                    colIndex = i;
+                    break;
+                }
+            }
+
+            if (colIndex == -1) {
+                System.out.println("Column not found: " + columnName);
+                return false;
+            }
+
+            // Get all row values for the column
+            List<WebElement> columnCells = driver.findElements(By.cssSelector(".ag-row .ag-cell:nth-child(" + (colIndex + 1) + ")"));
+            List<String> actualValues = columnCells.stream().map(WebElement::getText).collect(Collectors.toList());
+
+            // Create sorted version to compare
+            List<String> sortedValues = new ArrayList<>(actualValues);
+            sortedValues.sort(String::compareToIgnoreCase); // Sort Ascending
+            if (!ascending) {
+                Collections.reverse(sortedValues); // Sort Descending if needed
+            }
+
+            // Compare actual and expected sorted lists
+            return actualValues.equals(sortedValues);
+        } catch (Exception e) {
+            System.err.println("Error verifying sorting: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Verify if the number of records displayed matches the API response
+     * @param expectedCount The expected row count from API response
+     * @return True if count matches, otherwise False
+     */
+    public boolean verifyRecordCount(int expectedCount) {
+        try {
+            List<WebElement> rows = driver.findElements(By.cssSelector(".ag-row"));
+            int actualCount = rows.size();
+
+            System.out.println("Expected Count: " + expectedCount + " | Actual Count: " + actualCount);
+            return actualCount == expectedCount;
+        } catch (Exception e) {
+            System.err.println("Error verifying record count: " + e.getMessage());
+            return false;
+        }
+    }
+}
