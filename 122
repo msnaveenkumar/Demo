@@ -1,0 +1,73 @@
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class AGGridUtils {
+    private WebDriver driver;
+
+    public AGGridUtils(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    /**
+     * Verify if a column is sorted correctly (Ascending or Descending)
+     * @param columnName The column name to verify sorting
+     * @param ascending True for ascending, false for descending order check
+     * @return True if sorted correctly, otherwise False
+     */
+    public boolean isColumnSorted(String columnName, boolean ascending) {
+        try {
+            // Find the column index based on the column name
+            List<WebElement> columnHeaders = driver.findElements(By.cssSelector(".ag-header-cell-text"));
+            int colIndex = -1;
+
+            for (int i = 0; i < columnHeaders.size(); i++) {
+                if (columnHeaders.get(i).getText().trim().equalsIgnoreCase(columnName)) {
+                    colIndex = i;
+                    break;
+                }
+            }
+
+            if (colIndex == -1) {
+                System.out.println("Column not found: " + columnName);
+                return false;
+            }
+
+            // Get all row values for the column
+            List<WebElement> columnCells = driver.findElements(By.cssSelector(".ag-row .ag-cell:nth-child(" + (colIndex + 1) + ")"));
+            List<String> actualValues = columnCells.stream().map(WebElement::getText).collect(Collectors.toList());
+
+            // Create sorted version to compare
+            List<String> sortedValues = new ArrayList<>(actualValues);
+            sortedValues.sort(String::compareToIgnoreCase); // Sort Ascending
+            if (!ascending) {
+                Collections.reverse(sortedValues); // Sort Descending if needed
+            }
+
+            // Compare actual and expected sorted lists
+            return actualValues.equals(sortedValues);
+        } catch (Exception e) {
+            System.err.println("Error verifying sorting: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Verify if the number of records displayed matches the API response
+     * @param expectedCount The expected row count from API response
+     * @return True if count matches, otherwise False
+     */
+    public boolean verifyRecordCount(int expectedCount) {
+        try {
+            List<WebElement> rows = driver.findElements(By.cssSelector(".ag-row"));
+            int actualCount = rows.size();
+
+            System.out.println("Expected Count: " + expectedCount + " | Actual Count: " + actualCount);
+            return actualCount == expectedCount;
+        } catch (Exception e) {
+            System.err.println("Error verifying record count: " + e.getMessage());
+            return false;
+        }
+    }
+}

@@ -1,0 +1,43 @@
+
+Chat with Gemini in an app.
+Now available on Google Play.
+
+Try app
+Conversation with Gemini
+
+
+Extract text and add reply
+
+
+
+Plaintext
+
+Thanks for the update, to be clear this isn't me thinking people aren't committed, this is about me being able to explain to management and to also try and identify ways to bring this in effectively.
+
+So I is caution and might be faster with the more experienced in the team working on them.
+
+Please explain why the tabs like DGC data elements and transformation components on the screen just can't be just drag and drop into datasets?
+
+I understand this isn't all drag and drop however we are repeating design patterns now so the majority of the team should be no stranger to what work lies ahead.
+
+What are the top blocks in the way of the team preventing this getting done in 2 sprints?
+
+Add reply with below points to Ivor :
+We can drag n drop all the functionalities from the existing datasets module, but the complexity scenarios arise when it comes to linking the functionalities to the super table.
+Some functionalities have multiple api calls to happen continuously ie, for reports and downstream, we need to analyze how it can fit into super tables.
+The CRUD counts and review changes has to be rewritten inside the super tables and We may have unexpected scenarios for performance issues etc
+Reply to Ivor:
+
+Hi Ivor,
+
+Thanks for clarifying the complexities involved in integrating the functionalities with the super table. It's helpful to understand that while the initial drag and drop of functionalities from the existing datasets module is feasible, the real challenge lies in the subsequent linking and adaptation for the super table architecture.
+
+Specifically, the points you raised regarding:
+
+Complexity in linking functionalities to the super table: This highlights the architectural differences and the need for careful consideration during integration.
+Multiple API calls for certain functionalities: This necessitates a thorough analysis of how these continuous calls can be efficiently managed within the super table environment, especially concerning reports and downstream processes.
+Rewriting CRUD counts and review changes: This indicates a significant amount of rework required at the data management level to align with the super table structure.
+Potential for unexpected performance issues: This underscores the need for rigorous testing and optimization to ensure the stability and efficiency of the integrated system.
+Understanding these roadblocks is crucial for realistic planning and resource allocation. It seems that the effort involved goes beyond a simple drag-and-drop operation and requires a more in-depth development and testing approach.
+
+Let's discuss these points further to identify potential solutions and strategies to mitigate these challenges effectively.

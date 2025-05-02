@@ -1,0 +1,158 @@
+Initial Analysis & Technical Observations Upon Joining
+As part of my initial analysis before starting automation, I shared several key technical recommendations based on my 17 years of automation experience. These suggestions were discussed during my first one-on-one with Namrata.
+
+1. Framework Evaluation and Missed Opportunities
+Why are we not using Morgan Stanley's FAST framework?
+FAST is a stable, full-fledged automation framework used across different Lines of Business (LOBs):
+
+It is actively maintained by a core team
+
+Has a well-established user community
+
+Proven track record in scalability and cross-project adoption
+FAST Reference (internal)
+➤ Response received: "We need to integrate with dev builds."
+
+Why are we building a new automation framework from scratch?
+➤ Response received: "You wanted to change the framework? That is not your priority—focus only on SDH automation."
+
+Availability of mature, open-source automation frameworks
+Tools like QAL-TM, already in use at large organizations (Wells Fargo, JPMC, Cognizant), offer:
+
+Robust base functionality
+
+Active community support
+
+Reduced development overhead
+Yet, we chose to invest heavily in framework development from the ground up.
+
+2. Technical Gaps in the Current Framework
+Framework is still in a development phase
+
+It's not stable and lacks maturity.
+
+Requires significant ongoing effort to build core components.
+
+Spring Boot is underutilized
+
+Pages and web elements were being eagerly initialized at compile time, leading to memory/performance issues.
+
+Objects were unnecessarily initialized again using PageFactory.
+
+➤ This issue was addressed after it was raised in a QA meeting.
+
+Reusability missing in early stages
+
+Common utilities like JSON parsing/updating or dynamic test data generation were absent.
+
+Developers spent 5–6 hours per script due to lack of reusable methods.
+
+Reporting was not integrated initially
+
+Introduced later, requiring manual updates to existing scripts to accommodate the change.
+
+No static code quality tools
+
+Lack of SonarQube/CoPilot meant human errors (like camelCase naming violations) went undetected.
+
+CoPilot has since been introduced, partially addressing this.
+
+Missing Core Capabilities in the Existing Automation Framework
+No Support for Parallel Execution
+
+Parallel execution can save 40–50% of execution time, especially in large regression suites.
+
+No Auto-Retry for Failed Tests
+
+Re-running flaky scripts from scratch is time-inefficient.
+
+Auto-retry can save up to 95% execution effort in such cases.
+
+Using JUnit Instead of TestNG
+
+JUnit is simple, but TestNG offers advanced features, including:
+
+Parallel execution
+
+Retry logic
+
+Parameterized testing
+
+Not leveraging Selenide's full potential
+
+Selenide vs Selenium comparison shows many unused capabilities in our current usage.
+
+Process-Related Bottlenecks
+Unrealistic Planning & Review Gaps
+Test script development currently takes 5–6 hours for a new feature, especially in the absence of reusable libraries.
+
+The full cycle includes:
+
+Writing the script
+
+Raising a Pull Request (PR)
+
+Waiting for PR review
+
+If the PR is not reviewed and closed on the same day, the script remains in an incomplete state.
+
+The delay could be due to either the developer or reviewer—this needs clear ownership.
+
+➤ To ensure timely completion, same-day review and closure should be enforced.
+
+Git Usage Misunderstood
+Merge conflicts, push errors, and similar issues are common in collaborative environments.
+
+These problems do not imply a lack of Git knowledge.
+
+Even senior developers with 10–15 years of experience encounter Git issues—this is part of working with distributed version control and should be normalized.
+
+Summary of Recommendations
+
+Area	Recommendation
+Framework	Evaluate using FAST or QAL-TM to avoid reinventing the wheel
+Execution	Add support for parallel test execution
+Stability	Implement retry logic for flaky tests
+Libraries	Develop a centralized set of reusable utilities
+Tooling	Use static code analysis (SonarQube/CoPilot)
+Tech Stack	Migrate from JUnit to TestNG
+Review Process	Set SLAs for PR reviews to ensure script completeness
+Spring Boot	Optimize object initialization using dependency injection and lazy loading
+Selenide	Use Selenide features to simplify and stabilize automation scripts
+
+4. Unrealistic Targets & Escalations
+Despite clearly communicated timelines and the current limitations of the framework, I have faced repeated escalations from Namrata for minor delays or incomplete tasks—often tied to unrealistic or undefined targets.
+
+Escalations have been raised even when:
+
+Required reusable components were not yet available.
+
+PRs were pending review due to no fault of the developer.
+
+Targets were assigned without proper consideration of technical complexity and framework maturity.
+
+This has created unnecessary pressure and negatively impacted focus and productivity. Recommendation: A more collaborative and realistic planning approach is needed—one that accounts for actual effort involved, framework limitations, and dependencies (like PR reviews or tool readiness).
+
+
+Given these constraints, I believe the targets being set are often unrealistic, and escalations in such cases are not constructive. It would be much more effective if we could:
+
+Align on achievable timelines based on current technical limitations
+
+Ensure PR reviews are prioritized to avoid delays
+
+Collaborate on improving the framework's stability and usability
+
+I remain fully committed to delivering high-quality work and supporting the team’s goals, and I believe a more balanced and collaborative approach will help us move faster and with fewer blockers.
+
+
+Improvements After Tool Integration
+After the installation of CoPilot and Checkstyle, the number of review comments related to coding standards, syntax errors, and naming conventions has significantly reduced. These tools have helped:
+
+Identify and fix human errors early (e.g., camel case violations, missing annotations, etc.)
+
+Enforce consistent code quality before raising PRs
+
+Save review time and improve overall development efficiency
+
+Result: Review cycles have become smoother and more focused on functionality rather than formatting or syntax issues.
+
