@@ -1,0 +1,54 @@
+Gaps in the Existing Test Automation Framework
+1. Missing Core and Basic Features
+No Support for Parallel Execution
+Currently, the framework lacks support for parallel execution. This is a major bottleneck, as parallel execution can reduce execution time by 40–50%, thereby significantly improving efficiency and turnaround time.
+
+No Auto-Retry Mechanism for Failed Test Cases
+The absence of an auto-retry feature means flaky tests need to be rerun from scratch. Implementing retry logic can save up to 95% of execution time by avoiding full re-runs and focusing only on failed test cases.
+
+Using JUnit Instead of TestNG
+While JUnit is simple and easy to use, TestNG offers advanced capabilities such as:
+
+Parameterized testing
+
+Parallel test execution
+
+Retry mechanisms for flaky tests
+Migrating to TestNG would enable the framework to support more robust and scalable testing strategies.
+
+Underutilization of Imported Capabilities (e.g., Selenide)
+The framework uses Selenide, which is a powerful wrapper over Selenium, but its full capabilities are not leveraged. Refer to Selenide vs. Selenium for a clear comparison of features that can be better utilized.
+
+Challenges in Test Script Development
+2. Unrealistic Planning for Script Completion
+Initial Script Development Time
+Creating a new script typically takes 5–6 hours when reusable methods (e.g., JSON parsing, JSON object manipulation, data file creation) are not available. Lack of reusability significantly delays development.
+
+Pull Request (PR) Delays
+
+Script development is followed by raising a PR.
+
+If the PR is not reviewed and approved on the same day, the script remains in an incomplete state.
+
+Accountability for delayed reviews is unclear—whether it lies with the developer or reviewer—causing further bottlenecks.
+
+Suggestion: To ensure scripts are completed the same day, PRs must be reviewed and closed within the same timeframe.
+
+3. Common Git Challenges
+Misunderstanding Basic Git Issues
+Encountering issues such as merge conflicts or push failures is normal. These problems do not necessarily indicate a lack of Git knowledge.
+
+Even seasoned developers with 10–15 years of experience occasionally face such issues. It’s essential to recognize these as routine parts of collaborative development, not skill deficiencies.
+
+Recommendations
+Enable Parallel Execution: Integrate parallel execution to optimize test run time.
+
+Implement Auto-Retry Logic: Reduce the need for full reruns on flaky failures.
+
+Migrate from JUnit to TestNG: Unlock advanced testing features.
+
+Create Reusable Utilities: Develop utility methods for JSON parsing, data creation, etc.
+
+Enforce Same-Day PR Review: Establish SLAs or schedules for code review.
+
+Educate on Git Best Practices: Normalize challenges and encourage peer learning.
