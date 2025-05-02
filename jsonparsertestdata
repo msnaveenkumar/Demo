@@ -1,0 +1,156 @@
+package com.deep.json;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+
+public class JsonProcessor_File {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static void main(String[] args) throws IOException {
+        // Path to the original JSON file
+        String originalJsonPath = "test.json";
+
+        // Load the original JSON
+        JsonNode originalJson = mapper.readTree(new File(originalJsonPath));
+
+        // Create testdata.json and testtemplate.json
+        createTestDataAndTemplate(originalJson);
+
+        // Reconstruct the original JSON from testdata.json and testtemplate.json
+        JsonNode reconstructedJson = reconstructOriginalJson();
+
+        // Write the reconstructed JSON to a file
+        mapper.writeValue(new File("reconstructed.json"), reconstructedJson);
+        System.out.println("Reconstructed JSON saved to reconstructed.json");
+    }
+
+    private static void createTestDataAndTemplate(JsonNode originalJson) throws IOException {
+        // Create a deep copy of the original JSON
+        JsonNode templateJson = originalJson.deepCopy();
+        JsonNode testDataJson = originalJson.deepCopy();
+
+        // Replace leaf nodes in the template with placeholders
+        replaceLeafNodesWithPlaceholders(templateJson, "");
+
+        // Flatten the test data into the desired format
+        ObjectNode flattenedTestData = flattenJson(testDataJson);
+
+        // Write the template and test data to files
+        mapper.writeValue(new File("testtemplate.json"), templateJson);
+        mapper.writeValue(new File("testdata.json"), flattenedTestData);
+    }
+
+    private static void replaceLeafNodesWithPlaceholders(JsonNode node, String currentPath) {
+        if (node.isObject()) {
+            ObjectNode objectNode = (ObjectNode) node;
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                String newPath = currentPath.isEmpty() ? field.getKey() : currentPath + "_" + field.getKey();
+                if (field.getValue().isObject() || field.getValue().isArray()) {
+                    replaceLeafNodesWithPlaceholders(field.getValue(), newPath); // Recursively process nested objects/arrays
+                } else {
+                    // Replace leaf node with a placeholder
+                    objectNode.set(field.getKey(), TextNode.valueOf("${" + newPath + "}"));
+                }
+            }
+        } else if (node.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) node;
+            for (int i = 0; i < arrayNode.size(); i++) {
+                String newPath = currentPath + "_" + i;
+                JsonNode item = arrayNode.get(i);
+                if (item.isObject() || item.isArray()) {
+                    replaceLeafNodesWithPlaceholders(item, newPath); // Recursively process nested objects/arrays
+                } else {
+                    // Replace array item with a placeholder
+                    arrayNode.set(i, TextNode.valueOf("${" + newPath + "}"));
+                }
+            }
+        }
+    }
+
+    private static ObjectNode flattenJson(JsonNode node) {
+        ObjectNode flattenedNode = mapper.createObjectNode();
+        flattenJsonNode("", node, flattenedNode);
+        return flattenedNode;
+    }
+
+    private static void flattenJsonNode(String currentPath, JsonNode node, ObjectNode flattenedNode) {
+        if (node.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                String newPath = currentPath.isEmpty() ? field.getKey() : currentPath + "_" + field.getKey();
+                flattenJsonNode(newPath, field.getValue(), flattenedNode);
+            }
+        } else if (node.isArray()) {
+            for (int i = 0; i < node.size(); i++) {
+                String newPath = currentPath + "_" + i;
+                flattenJsonNode(newPath, node.get(i), flattenedNode);
+            }
+        } else {
+            // Leaf node: add to flattened JSON
+            flattenedNode.put(currentPath, node.asText());
+        }
+    }
+
+    private static JsonNode reconstructOriginalJson() throws IOException {
+        // Load the template and test data
+        JsonNode templateJson = mapper.readTree(new File("testtemplate.json"));
+        JsonNode testDataJson = mapper.readTree(new File("testdata.json"));
+
+        // Merge the template and test data
+        return mergeJsonNodes(templateJson, testDataJson);
+    }
+
+    private static JsonNode mergeJsonNodes(JsonNode template, JsonNode testData) {
+        if (template.isObject()) {
+            ObjectNode mergedNode = mapper.createObjectNode();
+            Iterator<Map.Entry<String, JsonNode>> fields = template.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                JsonNode value = field.getValue();
+                if (value.isObject() || value.isArray()) {
+                    // Recursively merge nested objects/arrays
+                    mergedNode.set(field.getKey(), mergeJsonNodes(value, testData));
+                } else if (value.isTextual() && value.asText().startsWith("${") && value.asText().endsWith("}")) {
+                    // Replace placeholder with value from testData
+                    String key = value.asText().substring(2, value.asText().length() - 1);
+                    if (testData.has(key)) {
+                        mergedNode.set(field.getKey(), testData.get(key));
+                    } else {
+                        mergedNode.set(field.getKey(), value); // Keep the placeholder if no value is found
+                    }
+                } else {
+                    // Keep the original value
+                    mergedNode.set(field.getKey(), value);
+                }
+            }
+            return mergedNode;
+        } else if (template.isArray()) {
+            // Handle arrays (replace placeholders in array items)
+            ArrayNode arrayNode = mapper.createArrayNode();
+            for (JsonNode item : template) {
+                arrayNode.add(mergeJsonNodes(item, testData)); // Recursively process array items
+            }
+            return arrayNode;
+        } else {
+            // Handle leaf nodes (replace placeholders)
+            if (template.isTextual() && template.asText().startsWith("${") && template.asText().endsWith("}")) {
+                String key = template.asText().substring(2, template.asText().length() - 1);
+                if (testData.has(key)) {
+                    return testData.get(key);
+                }
+            }
+            return template; // Return the original value if it's not a placeholder
+        }
+    }
+}
