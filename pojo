@@ -1,0 +1,29 @@
+Hi Team,
+
+After evaluating both POJO-based deserialization and JsonPath-based dynamic manipulation approaches for handling complex JSON payloads in our test automation framework, I recommend moving forward with JsonPath for the following reasons:
+
+✅ Use Case Summary
+Deeply nested JSON with arrays/objects (e.g., datasets → datasetElements → reportAttributes)
+Partial and dynamic updates (e.g., names, catalog IDs)
+Used primarily in POST operations in automation
+Requires response validation for updated fields
+🔍 Comparison Table
+Feature / Criteria	POJO (Plain Old Java Object)	JsonPath
+🔁 Partial field updates	❌ Difficult – full object mapping	✅ Easy – update via path
+🧱 Boilerplate code	❌ High – many Java classes	✅ None – work with raw JSON
+⚡ Dynamic data injection	❌ Limited	✅ Highly flexible
+🧪 Test automation efficiency	❌ Slower setup	✅ Fast and reusable
+🔍 Read/Assert specific values	❌ Verbose	✅ One-liner with JsonPath
+🔄 Post-operation (JSON as payload)	✅ Good for full objects	✅ Best for templates/partials
+🔧 Schema/type safety	✅ Compile-time safety	❌ Runtime only
+✅ Why JsonPath is the Better Fit
+We're not building domain models, just modifying JSON for tests.
+POJOs add complexity for deeply nested structures.
+JsonPath enables fast, flexible, low-code manipulation.
+🔚 Conclusion
+For our use case — automation testing with dynamic updates to JSON payloads and partial response validation — JsonPath offers greater flexibility, lower overhead, and faster development compared to POJOs.
+
+Please let me know if you'd like a sample project template or code walkthrough.
+
+Best regards,
+Your Name
