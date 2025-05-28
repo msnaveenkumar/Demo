@@ -1,0 +1,45 @@
+I hope this message finds you well.
+
+I wanted to share the recent analysis on our testing efforts for the current week, focusing on the impact of test automation across various features.
+
+Summary of Effort Savings:
+
+Feature
+Manual Effort (min)
+Automation Effort (min)
+Effort Saved (min)
+SDH WelcomePage
+20
+2
+18
+SDH Production Issue
+25
+5
+20
+SDH Datasets – API Regression
+54
+6
+48
+SDH Datasets – API RFB
+40
+6
+34
+Total Weekly Effort
+139 minutes
+19 minutes
+120 minutes
+
+ROI Calculation:
+
+The automation efforts have resulted in a weekly effort reduction of approximately 86.3%, saving 120 minutes out of a total manual effort of 139 minutes. This demonstrates a significant increase in efficiency and highlights the value of our ongoing automation initiatives.
+
+Conclusion:
+
+The data confirms that our automation strategies are delivering substantial productivity benefits, enabling faster testing cycles and better resource allocation.
+
+Please let me know if you'd like a detailed report or further insights on specific features.
+
+Best regards,
+[Your Name]
+[Your Position]
+[Your Contact Information]
