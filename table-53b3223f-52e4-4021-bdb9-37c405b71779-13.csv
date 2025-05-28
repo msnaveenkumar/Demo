@@ -1,0 +1,6 @@
+﻿"Feature","Manual Effort (min)","Automation Effort (min)","Effort Saved (min)"
+"SDH WelcomePage","20","2","18"
+"SDH Production Issue","25","5","20"
+"SDH Datasets – API Regression","54","6","48"
+"SDH Datasets – API RFB","40","6","34"
+"Total Weekly Effort","139 minutes","19 minutes","120 minutes"
