@@ -1,0 +1,77 @@
+Subject: ROI Analysis for 4-Month Test Automation Initiative (Nov 2024 – Feb 2025)
+
+Dear [Recipient's Name],
+
+I hope you are doing well.
+
+I am pleased to share the Return on Investment (ROI) analysis for our test automation efforts carried out over the past four months, from November 2024 to February 2025.
+
+Summary of Efforts and Gains:
+
+Feature
+Total TCs
+Manual TCs
+Automated TCs
+Automation %
+Overall Manual Time (min)
+Overall Automation Time (min)
+Effort Saved (min)
+PSD Datasets Validation
+45
+45
+45
+100%
+120
+15
+105
+PSD Datasets Validation (New UI)
+25
+25
+10
+40%
+90
+12
+78
+Workspace Datasets Validation
+74
+74
+56
+75.68%
+390
+20
+370
+Workspace Datasets Validation (New UI)
+50
+50
+12
+24%
+300
+35
+265
+
+Total Efforts & Savings over 4 months:
+
+Total manual effort: 900 minutes
+Total automated effort: 82 minutes
+Total effort saved per week: 818 minutes
+Total effort saved over 16 weeks (4 months):
+
+818min/week×16weeks=13,088min≈218hours
+ROI Calculation:
+
+Total manual effort over 4 months:
+900min/week×16weeks=14,400min≈240hours
+Total effort saved: 13,088 min
+ROI percentage:
+14,400
+13,088
+​
+ ×100≈91%
+This indicates that our automation efforts resulted in approximately 91% efficiency gain, translating to substantial resource savings and increased testing velocity.
+
+Please let me know if you require further details or a presentation of these findings.
+
+Best regards,
+[Your Name]
+[Your Position]
+[Your Contact Information]
